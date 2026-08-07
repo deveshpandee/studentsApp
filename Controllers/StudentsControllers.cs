@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyApi.DTO;
 using MyApi.Services;
@@ -16,41 +17,41 @@ public class StudentController: ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllStudents()
+    public async Task<IActionResult> GetAllStudents()
     {
-        return Ok(_studentService.GetAllStudents());
+        return Ok(await _studentService.GetAllStudentsAsync());
     }
 
     [HttpPost]
-    public IActionResult AddStudent([FromBody] CreateStudentDto dto)
+    public async Task<IActionResult> AddStudent([FromBody] CreateStudentDto dto)
     {
-        Student student = _studentService.AddStudent(dto);
+        Student student = await _studentService.AddStudentAsync(dto);
 
         return CreatedAtAction(nameof(GetStudentById), new {id = student.Id}, student);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetStudentById(int id)
+    public async Task<IActionResult> GetStudentById(int id)
     {
-        Student? student = _studentService.GetStudentById(id);
+        Student? student = await _studentService.GetStudentByIdAsync(id);
 
         if (student == null) return NotFound($"no student found with id: {id}");
         return Ok(student);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteStudentById(int id)
+    public async Task<IActionResult> DeleteStudentById(int id)
     {
-        bool isDeleted = _studentService.DeleteStudentById(id);
+        bool isDeleted = await _studentService.DeleteStudentByIdAsync(id);
         if(!isDeleted) 
             return NotFound($"Cannot find student with id {id}");
         return NoContent();
     }
 
     [HttpPatch("{id}")]
-    public IActionResult UpdateStudent([FromBody] UpdateStudentDto dto, int id)
+    public async Task<IActionResult> UpdateStudent([FromBody] UpdateStudentDto dto, int id)
     {
-        bool isUpdated = _studentService.UpdateStudent(id, dto);
+        bool isUpdated = await _studentService.UpdateStudentAsync(id, dto);
         if(!isUpdated) return NotFound();
 
         return NoContent();

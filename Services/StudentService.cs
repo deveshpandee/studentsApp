@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MyApi.Data;
 using MyApi.DTO;
 
@@ -11,7 +12,7 @@ public class StudentService: IStudentService
     {
         _context = context;
     }
-    public Student AddStudent(CreateStudentDto createStudentDto)
+    public async Task<Student> AddStudentAsync(CreateStudentDto createStudentDto)
     {
         Student student = new Student
         {
@@ -19,38 +20,38 @@ public class StudentService: IStudentService
             Age = createStudentDto.Age
         };
         _context.Students.Add(student);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return student;
     }
 
-    public bool UpdateStudent(int id, UpdateStudentDto updateStudentDto)
+    public async Task<bool> UpdateStudentAsync(int id, UpdateStudentDto updateStudentDto)
     {
-        Student? student = _context.Students.FirstOrDefault(s => s.Id == id);
+        Student? student = await _context.Students.FindAsync(id);
         if(student == null) return false;
         if(!string.IsNullOrWhiteSpace(updateStudentDto.Name))
             student.Name = updateStudentDto.Name;
 
         if(updateStudentDto.Age.HasValue)
             student.Age = updateStudentDto.Age.Value;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
-    public bool DeleteStudentById(int id)
+    public async Task<bool> DeleteStudentByIdAsync(int id)
     {
-        Student? student = _context.Students.FirstOrDefault(s => s.Id == id);
+        Student? student = await _context.Students.FindAsync(id);
         if(student == null) return false;
 
         _context.Students.Remove(student);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
-    public List<Student> GetAllStudents()
+    public async Task<List<Student>> GetAllStudentsAsync()
     {
 
-        return _context.Students.ToList();
+        return await _context.Students.ToListAsync();
     }
-    public Student? GetStudentById(int id)
+    public async Task<Student?> GetStudentByIdAsync(int id)
     {
-        return _context.Students.FirstOrDefault(s => s.Id == id);
+        return await _context.Students.FindAsync(id);
     }
 }
